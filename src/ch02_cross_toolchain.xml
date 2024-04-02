@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding="utf-8"?>
+
+<!DOCTYPE chapter
+[
+
+<!ENTITY % crl_ent PUBLIC "crl.ent" 'http://www.crifan.com/files/res/docbook/entity/crl.ent'>
+%crl_ent;
+
+]>
+
+<chapter
+    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xl="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:mathml="http://www.w3.org/1998/Math/MathML"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    
+    xml:id="ch02_cross_toolchain">
+<title>交叉工具链简介</title>
+<abstract></abstract>
+
+<para>搞懂了前面介绍的<xref linkend="ch01_crosscompile" />的概念后，再来解释什么是交叉工具链。</para>
+<para></para>
+<para>相关旧帖：<link xl:href="http://www.crifan.com/summary_about_toolchain_cross_compiler/">【整理】关于Toolchain,cross toolchain,cross compiler</link></para>
+<sect1 xml:id="what_is_toolchain"><title>什么是工具链</title>
+    <para>所谓的工具链，两部分的含义：</para>
+    <itemizedlist>
+        <listitem>工具
+            <para>工具，即tool</para>
+            <para>工具，是用来干活的</para>
+            <para>此处要干的活，目标是为了：生成（可以运行的）程序或库文件</para>
+            <para>而为了达成此目标，内部的执行过程和逻辑主要包含了：</para>
+            <orderedlist>
+                <listitem>编译
+                    <para>编译的输入（对象）是：程序代码</para>
+                    <para>编译输出（目标）是：目标文件</para>
+                    <para>编译所需要的工具是：编译器</para>
+                    <para>编译器，常见的编译器，即为gcc</para>
+                    <para></para>
+                </listitem>
+                <listitem>链接
+                    <para>链接的输入（对象）是：（程序运行时所依赖的，或者某个库所依赖的另外一个）库（文件）</para>
+                    <para>链接的输出（目标）是：程序的可执行文件，或者是可以被别人调用的完整的库文件</para>
+                    <para>链接所需要的工具是：链接器</para>
+                    <para>链接器，即ld</para>
+                    <para></para>
+                </listitem>
+            </orderedlist>
+            <para>即，此处，为了将程序代码，编译成可执行文件，涉及到编译，链接（等其他步骤），要依赖到很多相关的工具，最核心的是编译器gcc，链接器ld。</para>
+            <para>而此处，所谓的工具，主要指的就是：和程序编译链接等相关的gcc，ld等工具</para>
+            <tip xml:id="tools_binutils"><title>binutils包含了ld等工具</title>
+                <para>实际上，上面所说的ld，只是处理操作目标文件，二进制文件的最主要的一个工具</para>
+                <para>而和操作目标等文件相关的，还有其他很多工具的：as，objcopy，strip，ar等等工具的</para>
+                <para>所以，对此，GNU官网，弄出一个binutils，即binary utils，二进制工具（包），集成了这些，和操作二进制相关的工具集合，叫做binutils</para>
+                <para>所以，之后你所见到的，常见的工具，就是那个著名的<link xl:href="http://www.gnu.org/software/binutils/">GNU Binutils</link>了。</para>
+                <para>更加详细的解释，参见教程：<link xl:href="http://www.crifan.com/files/doc/docbook/binutils_intro/release/html/binutils_intro.html">GNU Binutils详解</link></para>
+            </tip>
+        </listitem>
+        <listitem>链
+            <para>链，即链条，chain</para>
+            <para>之所以能称为链，你是说明不止一个东西，然后，按照对应的逻辑，串在一起，链在一起</para>
+            <para>而对应的，涉及到的：</para>
+            <itemizedlist>
+                <listitem>不止一个东西
+                    <para>指的是就是前面所说的那个工具，即：和程序编译链接等相关的gcc，binutils等工具</para>
+                </listitem>
+                <listitem>按照对应的逻辑
+                    <para>指的就是，按照程序本身编译链接的先后顺序，即：</para>
+                    <para>先编译，后链接，再进行后期其他的处理等等，比如用objcopy去操作相应的目标文件等等。</para>
+                </listitem>
+            </itemizedlist>
+        </listitem>
+    </itemizedlist>
+    <para>如此的，将：</para>
+    <para>和程序编译链接等相关的gcc，binutils等工具</para>
+    <para>按照先编译后链接等相关的编译程序的内在逻辑</para>
+    <para>串起来，就成了我们所说的：工具链</para>
+    <para></para>
+</sect1>
+
+<sect1 xml:id="what_is_cross_toolchain"><title>什么是交叉工具链</title>
+    <para>普通所说的，工具链，指的是当前自己的本地平台的工具链。</para>
+    <para>用于，交叉编译，的工具链，就叫做交叉工具链</para>
+    <para>即，那些工具，即编译的gcc，链接的ld，以及相关的工具，用于交叉编译的，工具链，叫做交叉工具链。</para>
+    <para>交叉工具链，很明显，是用来，交叉编译，跨平台的程序所用的。</para>
+    <para></para>
+    <para>交叉工具链，和（本地）工具链类似，也是包含了很多的，对应的工具，交叉编译版本的gcc，ld，as等等。</para>
+    <para>但是，由于其中最最主要的是用于编译的gcc，所以，我们也常把：</para>
+    <para>交叉工具链，简称为交叉编译器</para>
+    <para>即：</para>
+    <para>严格意义上来说，交叉编译器，只是指的是交叉编译版本的gcc</para>
+    <para>但是实际上为了叫法上的方便，我们常说的交叉编译器，都是指的是交叉工具链</para>
+    <para>即，常说的交叉编译版本的gcc，比如arm-linux-gcc，实际上指代了，包含一系列交叉编译版本的交叉工具链（arm-linux-gcc，arm-linux-ld，arm-linux-as等等）</para>
+    <para></para>
+    <para>而此文中，后面，所说的，如无特殊指明，均用交叉编译器指代交叉工具链。</para>
+    <para>下面就对交叉编译器，进行详细的解释。</para>
+</sect1>
+
+</chapter>

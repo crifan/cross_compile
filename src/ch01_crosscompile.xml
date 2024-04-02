@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding="utf-8"?>
+
+<!DOCTYPE chapter
+[
+
+<!ENTITY % crl_ent PUBLIC "crl.ent" 'http://www.crifan.com/files/res/docbook/entity/crl.ent'>
+%crl_ent;
+
+]>
+
+<chapter
+    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xl="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:mathml="http://www.w3.org/1998/Math/MathML"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    
+    xml:id="ch01_crosscompile">
+<title>交叉编译简介</title>
+<abstract></abstract>
+
+<para>相关旧帖：</para>
+<para><link xl:href="http://www.crifan.com/summary_cross_compile_cross_compiler_cross_toolchain/">【整理】交叉编译和现存的交叉编译工具</link></para>
+<para><link xl:href="http://www.crifan.com/summary_about_toolchain_cross_compiler/">【整理】关于Toolchain,cross toolchain,cross compiler</link></para>
+<para></para>
+
+<sect1 xml:id="what_is_crosscompile"><title>什么是交叉编译</title>
+    <para>解释什么是交叉编译之前，先要明白一个概念：本地编译</para>
+    <para>我们之前常见的软件开发，都是属于本地编译：</para>
+    <para>在当前的PC下，x86的CPU下，直接编译出来程序，可以运行的程序（或者库文件），其可以直接在当前的环境，即x86的CPU下，当前电脑中，运行。</para>
+    <para>此时的编译，可以叫做，本地编译，即在当前目标平台下，编译出来的程序，也只是放到当前平台下，就可以运行的。</para>
+    <para></para>
+    <para>交叉编译，是一个和，本地编译，相对应的概念。</para>
+    <para>而所谓的，交叉编译，就是：</para>
+    <para>在一种平台上编译，编译出来的程序，是放到别的平台上运行</para>
+    <para>即编译的环境，和运行的环境，不一样，属于交叉的，此所谓cross</para>
+    <para>交叉编译，这个概念，主要和嵌入式开发有关。</para>
+    <example xml:id="arm_crosscompile_on_x86_run_on_arm"><title>在x86平台上编译，在ARM平台上运行</title>
+        <para>一种最常见的例子就是：</para>
+        <para>在进行嵌入式开发时</para>
+        <para>手上有个嵌入式开发板，CPU是arm的</para>
+        <para>然后在x86的平台下开发，比如Ubuntu的Linux，或者是Win7</para>
+        <para>然后就需要：</para>
+        <para>在x86的平台上，（用交叉编译器）去编译你写好的程序代码</para>
+        <para>编译生成的（可执行的）程序，是放到目标开发板，arm的CPU上运行的</para>
+        <para>此所谓：在x86平台上编译，在ARM平台上运行</para>
+    </example>
+    <para></para>
+    <para>交叉编译，英文常写作cross compile，也有其他写法：crosscompile, cross compiling等</para>
+    <para></para>
+</sect1>
+
+<sect1 xml:id="why_crosscompile"><title>为何要有交叉编译</title>
+    <para>之所以要有交叉编译，主要原因是：</para>
+    <para>嵌入式系统中的资源太少</para>
+    <para>具体的解释就是：</para>
+    <para>交叉编译出来的程序，所要运行的目标环境中，各种资源，都相对有限，所以很难进行直接的本地编译</para>
+    <para>最常见的情况是：</para>
+    <para>在进行嵌入式开发时，目标平台，即嵌入式开发板，比如是最大主频200MHz的ARM的CPU，加上32M的RAM，加上1G的Nand Flash等等。</para>
+    <para>在如此相对比较紧张的硬件资源的前提下，在已经运行了嵌入式Linux的前提下，是没法很方便的，直接在嵌入式Linux下，去本地编译，去在ARM的CPU下，编译出来，供ARM的CPU可以运行的程序的。</para>
+    <para>因为编译，开发，都需要相对比较多的CPU，内存，硬盘等资源，而嵌入式开发上的那点资源，只够嵌入式（Linux）系统运行的，没太多剩余的资源，供你本地编译。</para>
+    <para></para>
+    <tip xml:id="busybox_include_build_tools"><title>BusyBox中包含make等和编译开发相关的工具</title>
+        <para>对应的，等你后期熟悉了嵌入式开发，熟悉了Busybox后，</para>
+        <para>比如在Buildroot中去配置Busybox，或者单独交叉编译BusyBox时：</para>
+        <para><link xl:href="http://www.crifan.com/ubuntu_download_config_cross_compile_busybox_for_qemu_arm/">【记录】Ubuntu下为QEMU的arm平台交叉编译BusyBox</link></para>
+        <para>就会看到，后来的BusyBox，功能增加后，也已经包含了一些，和编译开发相关的工具，比如make等等</para>
+        <para>而这些工具，本来的话，只是，放在PC端使用，即在x86平台下做开发的时候，在交叉编译的时候，才用到的工具，</para>
+        <para>现在，也在（BusyBox的）嵌入式环境中，支持了。</para>
+        <para>此时，如果，你在BusyBox中把相关的开发工具都选上的话，</para>
+        <para>再加上，你的目标开发板的硬件配置足够强大的话，比如CPU都是以GHz为单位，等等</para>
+        <para>加上相关的开发的库和工具都很全的话</para>
+        <para>实际上，至少理论上，也是可以在你的嵌入式Linux中，进行，有限的，甚至是很大程度上的，本地开发</para>
+        <para>即，直接在ARM的开发板上，嵌入式Linux中，直接进行嵌入式开发，进行针对ARM的本地编译</para>
+        <para>比如，编译出一个helloworld，估计还是可以的</para>
+        <para>这样，就不存在，或者说，避免了，此处所说的，交叉编译，而变成了本地编译</para>
+        <para>就相当于，之前在x86的PC端的，编译程序放在x86的CPU上运行的本地编译，</para>
+        <para>在ARM的CPU，嵌入式Linux中，也实现了</para>
+        <para>但是很明显，对于更加复杂的程序或者库，在ARM开发板上直接编译的可行性和效率，相对就很低</para>
+        <para>而且如果是本身折腾Uboot等东西，本身目标运行环境，就没有完整的（嵌入式Linux）系统的话，那么就更加没法在目标平台实现本地编译了。</para>
+        <para>则还是只能进行，此处所说的，交叉编译</para>
+    </tip>
+    <para></para>
+</sect1>
+
+</chapter>

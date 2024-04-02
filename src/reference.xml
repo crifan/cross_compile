@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding="utf-8"?>
+
+<bibliography
+    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xl="http://www.w3.org/1999/xlink"
+    
+    xml:id="reference">
+
+<bibliomixed xml:id="ref.gnu_binutils">
+  <bibliosource><link xl:href="http://www.gnu.org/software/binutils/">GNU Binutils</link></bibliosource>
+  <author>GNU</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.tq2440_cdrom_download">
+  <bibliosource><link xl:href="http://www.armbbs.net/forum.php?mod=viewthread&amp;tid=859&amp;extra=page%3D1%26filter%3Dtypeid%26typeid%3D181%26typeid%3D181">[光盘下载] 2010年6月 最新TQ2440光盘下载 （Linux内核，WinCE的eboot，uboot均有更新）</link></bibliosource>
+  <author>天嵌科技</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.kegel_crosstool">
+  <bibliosource><link xl:href="http://kegel.com/crosstool/">http://kegel.com/crosstool/</link></bibliosource>
+  <author>kegel</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.denx_eldk">
+  <bibliosource><link xl:href="http://www.denx.de/wiki/DULG/ELDK">http://www.denx.de/wiki/DULG/ELDK</link></bibliosource>
+  <author>denx</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.openembedded_homepage">
+  <bibliosource><link xl:href="http://www.openembedded.org/wiki/Main_Page">http://www.openembedded.org/wiki/Main_Page</link></bibliosource>
+  <author>openembedded</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.wiki_bitbake">
+  <bibliosource><link xl:href="http://en.wikipedia.org/wiki/BitBake">http://en.wikipedia.org/wiki/BitBake</link></bibliosource>
+  <author>wikipedia</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.embedded_handbook">
+  <bibliosource><link xl:href="http://www.gentoo.org/proj/en/base/embedded/handbook/">http://www.gentoo.org/proj/en/base/embedded/handbook/</link></bibliosource>
+  <author>gentoo</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.pengutronix_toolchain">
+  <bibliosource><link xl:href="http://www.pengutronix.de/oselas/toolchain/index_en.html">http://www.pengutronix.de/oselas/toolchain/index_en.html</link></bibliosource>
+  <author>pengutronix</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.anyhu_sohu_com">
+  <bibliosource><link xl:href="http://anyhu.blog.sohu.com/214755651.html" /></bibliosource>
+  <author>anyhu</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.ymorin_is_a_geek_org">
+  <bibliosource><link xl:href="http://ymorin.is-a-geek.org/projects/crosstool">http://ymorin.is-a-geek.org/projects/crosstool</link></bibliosource>
+  <author>ymorin</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.building_our_own_toolchains">
+  <bibliosource><link xl:href="http://crosstool-ng.org/publis/ELC-E/2009/200910-ELCE-Morin-Building_our_own_toolchains.pdf">200910-ELCE-Morin-Building_our_own_toolchains.pdf</link></bibliosource>
+  <author>ymorin</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.cross_compiler_cross_toolchain">
+  <bibliosource><link xl:href="http://www.crifan.com/summary_cross_compile_cross_compiler_cross_toolchain/">【整理】交叉编译和现存的交叉编译工具</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.toolchain_cross_compiler">
+  <bibliosource><link xl:href="http://www.crifan.com/summary_about_toolchain_cross_compiler/">【整理】关于Toolchain,cross toolchain,cross compiler</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.cross_compile_busybox">
+  <bibliosource><link xl:href="http://www.crifan.com/ubuntu_download_config_cross_compile_busybox_for_qemu_arm/">【记录】Ubuntu下为QEMU的arm平台交叉编译BusyBox</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.emb_dev_cross_compiler">
+  <bibliosource><link xl:href="http://www.crifan.com/embedded_development_cross_compiler_and_toolchain/">嵌入式开发之交叉编译器</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.crosstool_ng_tuple_vendor">
+  <bibliosource><link xl:href="http://www.crifan.com/crosstool_tuple_vendor_string_ct_target_vendor/">【整理】crosstool中如何设置xscale的Tuple’s vendor string(CT_TARGET_VENDOR)</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.latest_crosstool_ng_for_xscale">
+  <bibliosource><link xl:href="http://www.crifan.com/reuse_latest_version_crosstool_ng_to_config_and_compile_for_xscale/">【记录】重试使用最新版本1.18.0的crosstool-ng去配置和编译xscale的交叉编译器</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.undefined_reference_to_raise">
+  <bibliosource><link xl:href="http://www.crifan.com/uboot_cross_compile_gcc_config_arm_lib1funcs_asm_undefined_reference_to_raise/">【已解决】uboot交叉编译出错：gcc/config/arm/lib1funcs.asm:1266: undefined reference to `raise’</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.summary_eabi_and_oabi">
+  <bibliosource><link xl:href="http://www.crifan.com/order_eabi_and_oabi/">［整理］EABI和OABI</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.uclibc_glibc_eglibc">
+  <bibliosource><link xl:href="http://www.crifan.com/relation_between_uclibc_glibc_eglibc/">【整理】uclibc,eglibc,glibc之间的区别和联系</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.arm_cross_toolchain_download">
+  <bibliosource><link xl:href="http://www.crifan.com/arm_cross_toolchain_cross_compiler_download/">【整理】arm的交叉工具链（交叉编译器）下载</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.crosstool_ng_intro">
+  <bibliosource><link xl:href="http://www.crifan.com/files/doc/docbook/crosstool_ng/release/html/crosstool_ng.html">crosstool-ng详解</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.buildroot_intro">
+  <bibliosource><link xl:href="http://www.crifan.com/files/doc/docbook/buildroot_intro/release/html/buildroot_intro.html">Buildroot详解</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.ubuntu_ctng_xscale">
+  <bibliosource><link xl:href="http://www.crifan.com/ubuntu_crosstool_ng_cross_compile_for_xscale_arm_xscale_linux_gnueabi/">【记录】Ubuntu下用crosstool-ng为xscale建立交叉编译器arm-xscale-linux-gnueabi-gcc</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+<bibliomixed xml:id="ref.summary_cross_compile_note">
+  <bibliosource><link xl:href="http://www.crifan.com/summary_cross_compile_library_note/">【整理】交叉编译心得和注意事项</link></bibliosource>
+  <author>Crifan Li</author>
+</bibliomixed>
+
+
+</bibliography>

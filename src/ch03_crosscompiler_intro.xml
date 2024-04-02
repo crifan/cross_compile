@@ -1,0 +1,743 @@
+<?xml version='1.0' encoding="utf-8"?>
+
+<!DOCTYPE chapter
+[
+
+<!ENTITY % crl_ent PUBLIC "crl.ent" 'http://www.crifan.com/files/res/docbook/entity/crl.ent'>
+%crl_ent;
+
+]>
+
+<chapter
+    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xl="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:mathml="http://www.w3.org/1998/Math/MathML"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    
+    xml:id="ch03_crosscompiler_intro">
+<title>交叉编译器简介</title>
+<abstract></abstract>
+
+<para>TODO：</para>
+<para>相关旧帖：<link xl:href="http://www.crifan.com/embedded_development_cross_compiler_and_toolchain/">嵌入式开发之交叉编译器</link></para>
+<para></para>
+
+<sect1 xml:id="crosscompiler_naming_rule"><title>交叉编译器的名字的命名规则</title>
+    <para>在折腾嵌入式开发，用到交叉编译器的时候，常常会看到这样的名字：</para>
+    <para>arm-xscale-linux-gnueabi-gcc</para>
+    <para>arm-liunx-gnu-gcc</para>
+    <para>等等</para>
+    <para>其中，对应的交叉编译器的前缀为：</para>
+    <para>arm-xscale-linux-gnueabi-</para>
+    <para>arm-liunx-gnu-</para>
+    <para>而关于这些名字，我之前也是没注意其具体含义，或者说对于其含义也是很模糊的感觉，不是很清楚这些名字是从何而来的。</para>
+    <para>后来，经过折腾了crosstool-ng后，基本上明白了这些名字，是如何生成的。</para>
+    <para>其中，貌似此交叉编译器命名的规则，应该是通用的，至少记得是Buildroot中，好像也是这样命名的。</para>
+    <para>下面，就以crosstool-ng为例，参考我之前折腾crosstool-ng期间：</para>
+    <para><link xl:href="http://www.crifan.com/crosstool_tuple_vendor_string_ct_target_vendor/">【整理】crosstool中如何设置xscale的Tuple’s vendor string(CT_TARGET_VENDOR)</link></para>
+    <para>所了解到的内容，来解释解释，这些名字的含义。</para>
+    <sect2 xml:id="crosscompiler_name_examples"><title>交叉编译器名字举例</title>
+        <para>此处，以编译crosstool-ng中：</para>
+        <para><link xl:href="http://www.crifan.com/reuse_latest_version_crosstool_ng_to_config_and_compile_for_xscale/">【记录】重试使用最新版本1.18.0的crosstool-ng去配置和编译xscale的交叉编译器</link></para>
+        <para>通过<command>ct-ng list-samples</command>中得到的输出为例，</para>
+        <para>当做交叉编译器的名字的例子，供参考：</para>
+        <screen>
+<![CDATA[
+CLi@PC-CLI-1 ~/develop/crosstool-ng/crosstool-ng-1.18.0_build
+$ ct-ng list-samples
+Status  Sample name
+[G.X]   alphaev56-unknown-linux-gnu
+[G.X]   alphaev67-unknown-linux-gnu
+[G.X]   arm-bare_newlib_cortex_m3_nommu-eabi
+[G.X]   arm-cortex_a15-linux-gnueabi
+[G..]   arm-cortex_a8-linux-gnueabi
+[G..]   arm-davinci-linux-gnueabi
+[G..]   armeb-unknown-eabi
+[G.X]   armeb-unknown-linux-gnueabi
+[G.X]   armeb-unknown-linux-uclibcgnueabi
+[G..]   arm-unknown-eabi
+[G..]   arm-unknown-linux-gnueabi
+[G.X]   arm-unknown-linux-uclibcgnueabi
+[G.X]   armv6-rpi-linux-gnueabi
+[G.X]   avr32-unknown-none
+[G..]   bfin-unknown-linux-uclibc
+[G..]   i586-geode-linux-uclibc
+[G.X]   i586-mingw32msvc,i686-none-linux-gnu
+[G.X]   i686-nptl-linux-gnu
+[G.X]   i686-unknown-mingw32
+[G.X]   m68k-unknown-elf
+[G.X]   m68k-unknown-uclinux-uclibc
+[G.X]   mips64el-n32-linux-uclibc
+[G.X]   mips64el-n64-linux-uclibc
+[G.X]   mips-ar2315-linux-gnu
+[G..]   mipsel-sde-elf
+[G..]   mipsel-unknown-linux-gnu
+[G.X]   mips-malta-linux-gnu
+[G..]   mips-unknown-elf
+[G.X]   mips-unknown-linux-uclibc
+[G..]   powerpc-405-linux-gnu
+[G.X]   powerpc64-unknown-linux-gnu
+[G..]   powerpc-860-linux-gnu
+[G.X]   powerpc-e300c3-linux-gnu
+[G.X]   powerpc-e500v2-linux-gnuspe
+[G..]   powerpc-unknown_nofpu-linux-gnu
+[G..]   powerpc-unknown-linux-gnu
+[G..]   powerpc-unknown-linux-uclibc
+[G.X]   s390-ibm-linux-gnu
+[G.X]   s390x-ibm-linux-gnu
+[G..]   sh4-unknown-linux-gnu
+[G..]   x86_64-unknown-linux-gnu
+[G..]   x86_64-unknown-linux-uclibc
+[G.X]   x86_64-unknown-mingw32
+ L (Local)       : sample was found in current directory
+ G (Global)      : sample was installed with crosstool-NG
+ X (EXPERIMENTAL): sample may use EXPERIMENTAL features
+ B (BROKEN)      : sample is currently broken
+]]>
+        </screen>
+        <para></para>
+    </sect2>
+    <sect2 xml:id="crosstool_ng_crosscompiler_naming_rule"><title>crosstool-ng中交叉编译前缀的命名规则</title>
+        <para>crosstool-ng中，交叉编译器的（前缀）的名字的命名规则是：</para>
+        <screen>arch-vendor-kernel-system</screen>
+        <para>对应分别是：</para>
+        <sect3 xml:id="crosscompiler_arch_part"><title>交叉编译器名字中的arch部分</title>
+            <para>arch，即系统架构</para>
+            <para>表示交叉编译器，是用于哪个目标系统架构中，用于那个平台中的</para>
+            <para>即，用此交叉编译器编译出来的程序，是运行在哪种CPU上面的</para>
+            <para>arch的值，常见的有很多种，比如arm，x86，mips等等。</para>
+            <example xml:id="eg.arch_in_names"><title>举例：交叉编译器中的arch的值</title>
+                <para>arm-cortex_a8-linux-gnueabi中的arm</para>
+                <para>mips-ar2315-linux-gnu中的mips</para>
+                <para>powerpc-e500v2-linux-gnuspe中的powerpc</para>
+                <para>x86_64-unknown-mingw32中的x86_64</para>
+            </example>
+            <sect4 xml:id="arch_in_crosstool_ng"><title>crosstool-ng中arch的值</title>
+                <para>crosstool-ng中，和arch对应的值，应该就是"Target options"中的"Target Architecture"的值了。</para>
+                <para>比如常见的，配置为arm的话，就是：</para>
+                <screen>
+<![CDATA[
+Target options
+  Target Architecture (arm)  --->
+]]>
+                </screen>
+                <para>对应的配置参数是：ARCH_arm</para>
+                <para></para>
+            </sect4>
+        </sect3>
+        <sect3 xml:id="crosscompiler_vendor_part"><title>交叉编译器名字中的vendor部分</title>
+            <para>vendor，即生成厂家，提供商</para>
+            <para>表示谁提供的，即谁制作出来这个交叉编译器的。</para>
+            <para>vendor的值，貌似是可以自己随便填写的。</para>
+            <para>其他常见写法，还有写成编译交叉编译器的作者的自己的名字的</para>
+            <para>比如，我叫crifan，那么就可以写成crifan，然后生成的交叉编译器，就是xxx-crifan-xxx-xxx了。</para>
+            <para>更加通用的做法，好像是：</para>
+            <para>把vendor写成，体系架构的值，比如我之前针对xscale的去配置crosstool-ng的时候，就写了个xscale。</para>
+            <para>或者写成CPU的厂家的名字，或者是开发板的名字等等。</para>
+            <example xml:id="eg.vendor_in_names"><title>举例：交叉编译器中的vendor的值</title>
+                <itemizedlist>
+                    <listitem>arm-cortex_a8-linux-gnueabi中的cortex_a8，就属于CPU的名字</listitem>
+                    <listitem>mips-ar2315-linux-gnu中的ar2315</listitem>
+                    <listitem>powerpc-e500v2-linux-gnuspe中的e500v2，也是CPU的内核名</listitem>
+                    <listitem>arm-buildroot-linux-uclibcgnueabi中的buildroot，是之前折腾Buildroot时，看到的，即Buildroot把自己视为当前自己制作出来的交叉编译器的vendor。</listitem>
+                </itemizedlist>
+            </example>
+            <sect4 xml:id="vendor_in_crosstool_ng"><title>crosstool-ng中vendor的值</title>
+                <para>crosstool-ng中，和vendor对应的值，应该就是"Toolchain options"中的"Tuple's vendor string"的值了。</para>
+                <para>比如我之前配置为xscale的话，就是：</para>
+                <screen>
+<![CDATA[
+Toolchain options
+  (xscale) Tuple's vendor string
+]]>
+                </screen>
+                <para>对应的配置参数是：CT_TARGET_VENDOR</para>
+                <para>对应的help的解释是：</para>
+                <screen>
+<![CDATA[
+  ┌────────────────────────────────── Tuple's vendor string ──────────────────────────────────┐
+  │ CT_TARGET_VENDOR:                                                                         │
+  │                                                                                           │
+  │ Vendor part of the target tuple.                                                          │
+  │                                                                                           │
+  │ A tuple is of the form arch-vendor-kernel-system.                                         │
+  │ You can set the second part, vendor, to whatever you see fit.                             │
+  │ Use a single word, or use underscores "_" to separate words.                              │
+  │ Use neither dash nor space, as it breaks things.                                          │
+  │                                                                                           │
+  │ Keep the default (unknown) if you don't know better.                                      │
+  │                                                                                           │
+  │ Symbol: TARGET_VENDOR [=xscale]                                                           │
+  │ Type  : string                                                                            │
+  │ Prompt: Tuple's vendor string                                                             │
+  │   Defined at config/toolchain.in:99                                                       │
+  │   Location:                                                                               │
+  │     -> Toolchain options                                                                  │
+]]>
+                </screen>
+            </sect4>
+        </sect3>
+        <sect3 xml:id="crosscompiler_kernel_part"><title>交叉编译器名字中的kernel部分</title>
+            <para>kernel，直译为，内核</para>
+            <para>其实指的是，你用此交叉编译器，编译出来的程序，所运行的目标系统</para>
+            <para>即，此交叉编译器，编译出来的程序，在什么系统中，什么环境中，运行。</para>
+            <para>而对应的环境或系统，主要有两种：</para>
+            <itemizedlist>
+                <listitem>Linux
+                    <para>表示：有OS（此处主要指的是Linux）操作系统的环境 </para>
+                    <para>比如，我用交叉编译器，编译一个helloworld程序，然后下载到嵌入式开发中的嵌入式Linux中运行，</para>
+                    <para>就属于，用此交叉编译器，编译出来的程序，是要运行于，带OS，即嵌入式Linux系统，环境中的</para>
+                    <para></para>
+                    <para>此处，简称为，有OS的目标系统：Linux</para>
+                </listitem>
+                <listitem>bare-metal
+                    <para>bare-metal，直译为：裸金属</para>
+                    <para>表示：无（此处主要指的是Linux）操作系统的环境，</para>
+                    <para>比如，用此交叉编译器，去编译一个Uboot，或者是其他一个小程序，是运行在，无嵌入式Linux的时候，单独运行的一个程序。</para>
+                    <para>比如，你购买的嵌入式系统开发版，常常附带一些小程序，比如点亮LED，跑马灯等程序，就是这种，运行在无OS的环境的</para>
+                    <para></para>
+                    <para>此处，简称为：无OS系统的：bare-metal</para>
+                </listitem>
+            </itemizedlist>
+            <para>关于，运行在有OS的Linux下，和，无OS的bare-metal，到底有何区别</para>
+            <para>目前，还没有完全搞懂。</para>
+            <para>但是，之前遇到一个实际的例子：</para>
+            <para>之前用比较新的一个交叉编译器去编译比较老的uboot时，会出现一个错误：</para>
+            <para><link xl:href="http://www.crifan.com/uboot_cross_compile_gcc_config_arm_lib1funcs_asm_undefined_reference_to_raise/">【已解决】uboot交叉编译出错：gcc/config/arm/lib1funcs.asm:1266: undefined reference to `raise’</link></para>
+            <para>其就是和这个kernel有关：</para>
+            <para>编译的uboot，目标运行平台，不是Linux，而是裸的开发板，即Linux还没有运行呢，Uboot去运行，去初始化开发板的时候</para>
+            <para>详细的情况，见该贴中的解释。</para>
+            <para></para>
+            <example xml:id="eg.kernel_in_names"><title>举例：交叉编译器中的kernel的值</title>
+                <itemizedlist>
+                    <listitem>arm-bare_newlib_cortex_m3_nommu-eabi中的bare_newlib_cortex_m3_nommu，此处的bare，应该就是指的是bare-metal，用于运行在无OS的环境下</listitem>
+                    <listitem>powerpc-e300c3-linux-gnu中的linux</listitem>
+                    <listitem>m68k-unknown-uclinux-uclibc中的uclinux，就是指的是编译出来的程序，是运行于没有MMU的uclinux下</listitem>
+                </itemizedlist>
+            </example>
+            <para></para>
+            <sect4 xml:id="kernel_in_crosstool_ng"><title>crosstool-ng中kernel的值</title>
+                <para>crosstool-ng中，和kernel对应的值，应该就是"Operating System"中的"Target OS"的值了。</para>
+                <para>比如我之前配置为Linux的话，就是：</para>
+                <screen>
+<![CDATA[
+Operating System
+  Target OS (linux)  --->
+]]>
+                </screen>
+                <para>对应的配置参数是：GEN_CHOICE_KERNEL中的CT_KERNEL_linux</para>
+                <para>对应的help的解释是：</para>
+                <screen>
+<![CDATA[
+  ┌────────────────────────────────────────── linux ──────────────────────────────────────────┐
+  │ CT_KERNEL_linux:                                                                          │
+  │                                                                                           │
+  │ Build a toolchain targeting systems running Linux as a kernel.                            │
+  │                                                                                           │
+  │ Symbol: KERNEL_linux [=y]                                                                 │
+  │ Type  : boolean                                                                           │
+  │ Prompt: linux                                                                             │
+  │   Defined at config.gen/kernel.in:8                                                       │
+  │   Depends on: GEN_CHOICE_KERNEL [=y] && KERNEL_linux_AVAILABLE [=y]                       │
+  │   Location:                                                                               │
+  │     -> Operating System                                                                   │
+  │       -> Target OS (GEN_CHOICE_KERNEL [=y])                                               │
+  │   Selects: KERNEL_SUPPORTS_SHARED_LIBS [=y]                                               │
+
+]]>
+                </screen>
+            </sect4>
+        </sect3>
+        <sect3 xml:id="crosscompiler_system_part"><title>交叉编译器名字中的system部分</title>
+            <para>system，直译为，系统</para>
+            <para>其实主要表示的，交叉编译器所选择的库函数和目标系统</para>
+            <para>最常见的一些值有，gnu，gnueabi，uclibcgnueabi等等。</para>
+            <para>其中，此处有几方面的值，表示了几方面的含义：</para>
+            <sect4 xml:id="system_gnu"><title>system中的gnu</title>
+                <para>好像都是gnu</para>
+                <para>不是很明白，貌似是：</para>
+                <para>gnu == gnu libc == glibc</para>
+                <para>即，gnu，就是表示用的是glibc的意思。</para>
+                <para></para>
+                <sect5 xml:id="system_gnu_in_crosstool_ng"><title>crosstool-ng中system为gnu的情况</title>
+                    <para>crosstool-ng中，和system中gnu对应的值，应该就是"C-library"中的"C library"的值设置为"glibc"了。</para>
+                    <screen>
+<![CDATA[
+C-library
+  C library (glibc)  ---> 
+]]>
+                    </screen>
+                    <para>对应的配置参数是：CT_LIBC_glibc</para>
+                    <para>对应的help的解释是：</para>
+                    <screen>
+<![CDATA[
+  ┌────────────────────────────────────────── glibc ──────────────────────────────────────────┐
+  │ CT_LIBC_glibc:                                                                            │
+  │                                                                                           │
+  │ The de-facto standard for Linux distributions.                                            │
+  │ Feature-rich, but large...  Most usefull for desktop-like systems.                        │
+  │                                                                                           │
+  │ Symbol: LIBC_glibc [=y]                                                                   │
+  │ Type  : boolean                                                                           │
+  │ Prompt: glibc                                                                             │
+  │   Defined at config.gen/libc.in:53                                                        │
+  │   Depends on: GEN_CHOICE_LIBC [=y] && LIBC_glibc_AVAILABLE [=y] && !WINDOWS [=n] && !\    │
+  │ BARE_METAL [=n] && ARCH_USE_MMU [=y]                                                      │
+  │   Location:                                                                               │
+  │     -> C-library                                                                          │
+  │       -> C library (GEN_CHOICE_LIBC [=y])                                                 │
+  │   Selects: LIBC_SUPPORT_NPTL [=y] && CC_CORE_PASSES_NEEDED [=y]                           │
+]]>
+                    </screen>
+                </sect5>
+                <para></para>
+            </sect4>
+            <sect4 xml:id="system_eabi"><title>system中的eabi</title>
+                <para>与此相对应的，之前早期的是oabi</para>
+                <para>eabi和oabi的对比，详见：</para>
+                <para><link xl:href="http://www.crifan.com/order_eabi_and_oabi/">［整理］EABI和OABI</link></para>
+                <para></para>
+                <sect5 xml:id="system_eabi_in_crosstool_ng"><title>crosstool-ng中system为eabi的情况</title>
+                    <para>crosstool-ng中，和system中eabi对应的值，应该就是"Target options"中的"-*- Use EABI"的值了。</para>
+                    <screen>
+<![CDATA[
+Target options
+  -*- Use EABI
+]]>
+                    </screen>
+                    <para>注意：此处是选择的ARM，EABI在此处，已经是默认，无法修改的值，只能是EABI了。</para>
+                    <para>好像是因为，Linux内核等其他选择导致的，此处无法更改EABI。</para>
+                    <para>对应的配置参数是：CT_ARCH_ARM_EABI</para>
+                    <para>对应的help的解释是：</para>
+                    <screen>
+<![CDATA[
+  ┌──────────────────────────────────────── Use EABI ─────────────────────────────────────────┐
+  │ CT_ARCH_ARM_EABI:                                                                         │
+  │                                                                                           │
+  │ Set up the toolchain so that it generates EABI-compliant binaries.                        │
+  │                                                                                           │
+  │ If you say 'n' here, then the toolchain will generate OABI binaries.                      │
+  │ OABI has long been deprecated, and is now considered legacy.                              │
+  │                                                                                           │
+  │ Symbol: ARCH_ARM_EABI [=y]                                                                │
+  │ Type  : boolean                                                                           │
+  │ Prompt: Use EABI                                                                          │
+  │   Defined at config/arch/arm.in.2:54                                                      │
+  │   Depends on: ARCH_arm [=y]                                                               │
+  │   Location:                                                                               │
+  │     -> Target options                                                                     │
+  │   Selected by: ARCH_ARM_EABI_FORCE [=y] && ARCH_arm [=y]                                  │
+]]>
+                    </screen>
+                </sect5>
+            </sect4>
+            <sect4 xml:id="system_uclibc"><title>system中的uclibc</title>
+                <para>uclibc，是c库中的一种</para>
+                <para>crosstool-ng中，目前支持三种：glibc,eglibc,uclibc</para>
+                <para>关于三种的关系，详见：</para>
+                <para><link xl:href="http://www.crifan.com/relation_between_uclibc_glibc_eglibc/">【整理】uclibc,eglibc,glibc之间的区别和联系</link></para>
+                <para></para>
+                <sect5 xml:id="system_uclibc_in_crosstool_ng"><title>crosstool-ng中system为uclibc的情况</title>
+                    <para>crosstool-ng中，和system中uclibc对应的值，应该就是"C-library"中的"C library"的值设置为"uClibc"了。</para>
+                    <screen>
+<![CDATA[
+C-library
+  C library (uClibc)  --->
+]]>
+                    </screen>
+                    <para>对应的配置参数是：CT_LIBC_uClibc</para>
+                    <para>对应的help的解释是：</para>
+                    <screen>
+<![CDATA[
+  ┌───────────────────────────────────────── uClibc ──────────────────────────────────────────┐
+  │ CT_LIBC_uClibc:                                                                           │
+  │                                                                                           │
+  │ The de-facto standard for embeded linux systems.                                          │
+  │                                                                                           │
+  │ Highly configurable, thus as feature-rich as you                                          │
+  │ need, without compromising for size.                                                      │
+  │                                                                                           │
+  │ Symbol: LIBC_uClibc [=y]                                                                  │
+  │ Type  : boolean                                                                           │
+  │ Prompt: uClibc                                                                            │
+  │   Defined at config.gen/libc.in:24                                                        │
+  │   Depends on: GEN_CHOICE_LIBC [=y] && LIBC_uClibc_AVAILABLE [=y] && !WINDOWS [=n] && !\   │
+  │ BARE_METAL [=n]                                                                           │
+  │   Location:                                                                               │
+  │     -> C-library                                                                          │
+  │       -> C library (GEN_CHOICE_LIBC [=y])                                                 │
+  │   Selects: LIBC_SUPPORT_LINUXTHREADS [=y] && LIBC_SUPPORT_THREADS_NONE [=y] && \          │
+  │ CC_CORE_PASSES_NEEDED [=y]                                                                │
+]]>
+                    </screen>
+                </sect5>
+            </sect4>
+            <para></para>
+            <para>所以，针对上述，gnu，eabi，uclibc等几个选项，对应的常见的一些组合的含义是：</para>
+            <itemizedlist>
+                <listitem>gnu
+                    <para>等价于：glibc+oabi</para>
+                    <para></para>
+                    <para></para>
+                </listitem>
+                <listitem>gnueabi
+                    <para>等价于：glibc+eabi</para>
+                    <para></para>
+                    <para></para>
+                </listitem>
+                <listitem>uclibc
+                    <para>等价于：uclibc+oabi（待确认）</para>
+                    <para></para>
+                    <para></para>
+                </listitem>
+            </itemizedlist>
+            <para></para>
+            <example xml:id="eg.system_in_names"><title>举例：交叉编译器中的system的值</title>
+                <itemizedlist>
+                    <listitem>arm-cortex_a8-linux-gnueabi中的gnueabi，即glibc+eabi</listitem>
+                    <listitem>mips-ar2315-linux-gnu中的gnu，即glibc+oabi</listitem>
+                    <listitem>powerpc-e500v2-linux-gnuspe中的gnuspe，没搞懂啥意思。。</listitem>
+                    <listitem>x86_64-unknown-mingw32中的mingw32，用的是Windows下的mingw32的库</listitem>
+                </itemizedlist>
+            </example>
+            <para></para>
+        </sect3>
+    </sect2>
+    <para></para>
+</sect1>
+
+<sect1 xml:id="how_to_get_crosscompiler"><title>如何得到交叉编译器</title>
+    <para>了解了之前的交叉编译器的命名规则后，也就明白了交叉编译，针对不同架构，平台，目标系统等的区别。</para>
+    <para>而对于嵌入式开发，想要获得，针对我们所需要的，目标的CPU所合适的交叉编译器，就成了接下来，顺其自然要考虑的事情。</para>
+    <para>想要得到，可用的，针对自己的CPU的交叉编译器，主要有两种方式：</para>
+    <sect2 xml:id="download_existing_crosscompiler"><title>拿来主义：直接去下载和使用别人已经编译好的交叉编译器</title>
+        <para>难度等级：1级</para>
+        <para>这个没有啥特殊要求解释的，就是，网上，总会有，免费的，好用的各种资源的。</para>
+        <para>其中就包括，别人，已经针对某些CPU，某些平台，编译好了交叉编译器了</para>
+        <para>而你要做的事情就是：找到合适的，并下载下来使用。</para>
+        <para>关于网上，现存的，可用的，针对arm的交叉编译器，可以参考我之前整理的一些：</para>
+        <para><link xl:href="http://www.crifan.com/arm_cross_toolchain_cross_compiler_download/">【整理】arm的交叉工具链（交叉编译器）下载</link></para>
+        <para></para>
+        <tip xml:id="common_method_get_crosscompiler"><title>常见的，获得交叉编译器的方式</title>
+            <para>其实，相对比较常见的，获得可用的，交叉编译器的方式是：</para>
+            <para>当你购买某一家的（嵌入式）开发板的时候，然后开发板厂家，提供你对应的硬件开发板的同时，也提供对应的整套开发软件。</para>
+            <para>此处，整套的开发软件，其中就包括，对应的，用来编译其厂家提供的BSP的软件源码的，交叉编译器。</para>
+            <para>即：一般来说，你买了某家的某款的嵌入式开发板的时候，就送了对应的交叉编译器</para>
+            <example xml:id="buy_tq2440_get_crosscompiler"><title>购买了TQ2440的开发板，就送了对应的交叉编译器</title>
+                <para>拿我之前，购买的TQ2440的开发板为例</para>
+                <para>买了TQ2440的开发板的时候，就送了对应的光盘了。</para>
+                <para>光盘里面，就包含了对应的各种开发资料和交叉编译器</para>
+                <para>其实，对于交叉编译器本身，TQ2440的厂家，叫做天嵌公司，其本身有自己的论坛，论坛里面，也可以免费下载到对应的交叉编译器的</para>
+                <para><link xl:href="http://www.armbbs.net/forum.php?mod=viewthread&amp;tid=859&amp;extra=page%3D1%26filter%3Dtypeid%26typeid%3D181%26typeid%3D181">[光盘下载] 2010年6月 最新TQ2440光盘下载 （Linux内核，WinCE的eboot，uboot均有更新）</link></para>
+                <para></para>
+            </example>
+        </tip>
+    </sect2>
+    <sect2 xml:id="self_build_crosscompiler"><title>自己动手，丰衣足食：自己去编译出来一套自己想要的交叉编译器</title>
+        <para>如果网上没有合适的交叉编译器，那么就需要你手动去制作了。</para>
+        <para>自己手动制作交叉编译器，又分两种：</para>
+        <sect3 xml:id="from_scratch_build_crosscompiler"><title>白手起家从头开始制作交叉编译器</title>
+            <para>难度等级：10级</para>
+            <para>此法，目前我也还没折腾过</para>
+            <para>只是知道，难度，相对是最大的</para>
+            <para>等抽空折腾了之后，再总结出来。</para>
+            <para></para>
+        </sect3>
+        <sect3 xml:id="use_tool_build_crosscompiler"><title>借助别人的工具去制作交叉编译器</title>
+            <para>难度等级：6级</para>
+            <para>相关旧帖：<link xl:href="http://www.crifan.com/summary_cross_compile_cross_compiler_cross_toolchain/">【整理】交叉编译和现存的交叉编译工具</link></para>
+            <para>对于，制作交叉编译器这样的事情，本身是很需要技术含量，和很耗时的事情</para>
+            <para>所以，对此，现在现存很多相关的工具，以简化制作交叉编译器这个事情的复杂度，帮你节省很多精力和时间</para>
+            <para>而你所要做的事情就只是：</para>
+            <para>了解有哪些工具，选个合适的工具，搞懂如何使用，用其制作出你所需要的交叉编译器，即可。</para>
+            <para>关于现在有哪些交叉编译器的制作工具，正是下文正要详细解释的：</para>
+            <para><xref linkend="crosscompiler_tools" /></para>
+        </sect3>
+    </sect2>
+</sect1>
+
+<sect1 xml:id="crosscompiler_tools"><title>各种制作交叉编译器的工具</title>
+    <para>下面，就针对，现存已知的，交叉编译器，的制作工具，进行简单的总结和介绍：</para>
+    <para></para>
+    <sect2 xml:id="crosscompile_tool_crosstool_ng"><title>crosstool-NG</title>
+        <para>crosstool-ng的主页：<link xl:href="http://crosstool-ng.org/">http://crosstool-ng.org/</link></para>
+        <para></para>
+        <para>关于crosstool-ng的更多介绍和使用，可以参考我的另外一个教程：</para>
+        <para><link xl:href="http://www.crifan.com/files/doc/docbook/crosstool_ng/release/html/crosstool_ng.html">crosstool-ng详解</link></para>
+    </sect2>
+
+    <sect2 xml:id="crosscompile_tool_buildroot"><title>Buildroot</title>
+        <para>Buildroot主页：<link xl:href="http://www.buildroot.net/">http://www.buildroot.net/</link></para>
+        <para>特点：不仅能制作交叉工具链，而且还可以制作根文件系统rootfs。而且还支持同时编译对应的Linux内核和Uboot。</para>
+        <para></para>
+        <para></para>
+        <para>关于Buildroot的更多介绍和使用，可以参考我的另外一个教程：</para>
+        <para><link xl:href="http://www.crifan.com/files/doc/docbook/buildroot_intro/release/html/buildroot_intro.html">Buildroot详解</link></para>
+    </sect2>
+
+    <sect2 xml:id="crosscompile_tool_crosstool"><title>crosstool</title>
+        <para><link xl:href="http://kegel.com/crosstool/">http://kegel.com/crosstool/</link></para>
+        <para>现在用的最多的是那个0.43的版本：</para>
+        <para><link xl:href="http://kegel.com/crosstool/crosstool-0.43.tar.gz">crosstool-0.43.tar.gz</link></para>
+        <para>也可以去在线浏览对应的源码：<link xl:href="http://kegel.com/crosstool/crosstool-0.43/">在线浏览crosstool-0.43源码</link></para>
+    </sect2>
+
+    <sect2 xml:id="crosscompile_tool_eldk"><title>Embedded Linux Development Kit (ELDK)</title>
+        <para><link xl:href="http://www.denx.de/wiki/DULG/ELDK">http://www.denx.de/wiki/DULG/ELDK</link></para>
+        <para>也是和交叉编译相关的。</para>
+        <para>提供编译好的东西供使用。</para>
+        <para>可以去这里：</para>
+        <para><link xl:href="http://www.denx.de/wiki/view/DULG/ELDKAvailability">http://www.denx.de/wiki/view/DULG/ELDKAvailability</link></para>
+        <para>去下载。</para>
+    </sect2>
+
+    <sect2 xml:id="crosscompile_tool_openembedded_bitbake"><title>OpenEmbedded的BitBake</title>
+        <para>OpenEmbedded是一个创建嵌入式Linux的整套框架，其中包括了制作对应的交叉编译器的工具，叫做BitBake</para>
+        <para>OpenEmbedded简称OE。</para>
+        <para>OpenEmbedded主页：<link xl:href="http://www.openembedded.org/wiki/Main_Page">http://www.openembedded.org/wiki/Main_Page</link></para>
+        <para>OpenEmbedded的在线文档：<link xl:href="http://docs.openembedded.org/usermanual/usermanual.html">OpenEmbedded User Manual</link></para>
+        <para>关于BitBake可去参考：</para>
+        <para><link xl:href="http://en.wikipedia.org/wiki/BitBake">http://en.wikipedia.org/wiki/BitBake</link></para>
+        <para>中的：</para>
+        <para><link xl:href="http://developer.berlios.de/projects/bitbake">http://developer.berlios.de/projects/bitbake</link></para>
+    </sect2>
+
+    <sect2 xml:id="crosscompile_tool_crossdev"><title>Crossdev</title>
+        <para><link xl:href="http://www.gentoo.org/proj/en/base/embedded/handbook/">http://www.gentoo.org/proj/en/base/embedded/handbook/</link></para>
+        <para>中的：</para>
+        <para><link xl:href="http://www.gentoo.org/proj/en/base/embedded/handbook/?part=1&amp;chap=1">http://www.gentoo.org/proj/en/base/embedded/handbook/?part=1&amp;chap=1</link></para>
+    </sect2>
+
+    <sect2 xml:id="crosscompile_tool_oselas_toolchain"><title>OSELAS.Toolchain()</title>
+        <para><link xl:href="http://www.pengutronix.de/oselas/toolchain/index_en.html">http://www.pengutronix.de/oselas/toolchain/index_en.html</link></para>
+        <para></para>
+        <para></para>
+    </sect2>
+</sect1>
+
+<sect1 xml:id="use_existing_vs_self_build"><title>使用已有的交叉编译器和自己手动编译交叉编译器之间的对比</title>
+    <para>后来在：</para>
+    <para><link xl:href="http://ymorin.is-a-geek.org/projects/crosstool">http://ymorin.is-a-geek.org/projects/crosstool</link></para>
+    <para>中发现作者ymorin之前的一些会议演讲：</para>
+    <para><link xl:href="http://crosstool-ng.org/publis/">http://crosstool-ng.org/publis/</link></para>
+    <para>等内容，比如：</para>
+    <para><link xl:href="http://crosstool-ng.org/publis/ELC-E/2009/200910-ELCE-Morin-Building_our_own_toolchains.pdf">200910-ELCE-Morin-Building_our_own_toolchains.pdf</link></para>
+    <para>其中，对于下载别人已有的交叉编译器和自己手动编译一个交叉编译器之间，做了些对比，分析了各自的优缺点。</para>
+    <para>个人觉得其说的比较全面，特此整理如下：</para>
+    <sect2 xml:id="use_existing_pros"><title>使用已有交叉编译器的优点</title>
+        <itemizedlist>
+            <listitem>安装和使用都很方便
+                <para>别人发布的，已经编译好的交叉编译器，基本都是压缩包</para>
+                <para>然后你解压后，即可得到对应的，可用的，交叉编译器</para>
+                <para>其效果，类似于，之前自己编译出来的交叉编译器，有对应的交叉编译版本的gcc，ld等等程序，即：</para>
+                <para>arm-xscale-linux-gnueabi-gcc</para>
+                <para>arm-xscale-linux-gnueabi-ld</para>
+                <para>等等文件的了。</para>
+                <para>比如：</para>
+                <para><link xl:href="http://www.crifan.com/ubuntu_crosstool_ng_cross_compile_for_xscale_arm_xscale_linux_gnueabi/">【记录】Ubuntu下用crosstool-ng为xscale建立交叉编译器arm-xscale-linux-gnueabi-gcc</link></para>
+                <para>中的：</para>
+                <screen>
+<![CDATA[
+crifan@ubuntu:~/develop/crosstool-ng/crosstool-ng-1.18.0_build$ ls /home/crifan/develop/crosstool-ng/x-tools/arm-xscale-linux-gnueabi/bin -lh
+total 18M
+-r-xr-xr-x 1 crifan crifan 605K Aug  8 01:10 arm-xscale-linux-gnueabi-addr2line
+-r-xr-xr-x 2 crifan crifan 633K Aug  8 01:10 arm-xscale-linux-gnueabi-ar
+-r-xr-xr-x 2 crifan crifan 1.1M Aug  8 01:10 arm-xscale-linux-gnueabi-as
+-r-xr-xr-x 2 crifan crifan 276K Aug  8 01:10 arm-xscale-linux-gnueabi-c++
+lrwxrwxrwx 1 crifan crifan   28 Aug  8 00:54 arm-xscale-linux-gnueabi-cc -> arm-xscale-linux-gnueabi-gcc
+-r-xr-xr-x 1 crifan crifan 605K Aug  8 01:10 arm-xscale-linux-gnueabi-c++filt
+-r-xr-xr-x 1 crifan crifan 276K Aug  8 01:10 arm-xscale-linux-gnueabi-cpp
+-r-xr-xr-x 1 crifan crifan 3.1K Aug  7 23:57 arm-xscale-linux-gnueabi-ct-ng.config
+-r-xr-xr-x 1 crifan crifan  26K Aug  8 01:10 arm-xscale-linux-gnueabi-elfedit
+-r-xr-xr-x 2 crifan crifan 276K Aug  8 01:10 arm-xscale-linux-gnueabi-g++
+-r-xr-xr-x 2 crifan crifan 272K Aug  8 01:10 arm-xscale-linux-gnueabi-gcc
+-r-xr-xr-x 2 crifan crifan 272K Aug  8 01:10 arm-xscale-linux-gnueabi-gcc-4.6.0
+-r-xr-xr-x 1 crifan crifan  30K Aug  8 01:10 arm-xscale-linux-gnueabi-gcov
+-r-xr-xr-x 1 crifan crifan 2.7M Aug  8 01:10 arm-xscale-linux-gnueabi-gdb
+-r-xr-xr-x 1 crifan crifan 2.7M Aug  8 01:10 arm-xscale-linux-gnueabi-gdbtui
+-r-xr-xr-x 1 crifan crifan 670K Aug  8 01:10 arm-xscale-linux-gnueabi-gprof
+-r-xr-xr-x 4 crifan crifan 1.1M Aug  8 01:10 arm-xscale-linux-gnueabi-ld
+-r-xr-xr-x 4 crifan crifan 1.1M Aug  8 01:10 arm-xscale-linux-gnueabi-ld.bfd
+-r-xr-xr-x 1 crifan crifan  11K Aug  8 01:10 arm-xscale-linux-gnueabi-ldd
+-r-xr-xr-x 2 crifan crifan 617K Aug  8 01:10 arm-xscale-linux-gnueabi-nm
+-r-xr-xr-x 2 crifan crifan 775K Aug  8 01:10 arm-xscale-linux-gnueabi-objcopy
+-r-xr-xr-x 2 crifan crifan 943K Aug  8 01:10 arm-xscale-linux-gnueabi-objdump
+-r-xr-xr-x 1 crifan crifan  11K Aug  8 01:10 arm-xscale-linux-gnueabi-populate
+-r-xr-xr-x 2 crifan crifan 633K Aug  8 01:10 arm-xscale-linux-gnueabi-ranlib
+-r-xr-xr-x 1 crifan crifan 317K Aug  8 01:10 arm-xscale-linux-gnueabi-readelf
+-r-xr-xr-x 1 crifan crifan 609K Aug  8 01:10 arm-xscale-linux-gnueabi-size
+-r-xr-xr-x 1 crifan crifan 605K Aug  8 01:10 arm-xscale-linux-gnueabi-strings
+-r-xr-xr-x 2 crifan crifan 775K Aug  8 01:10 arm-xscale-linux-gnueabi-strip
+crifan@ubuntu:~/develop/crosstool-ng/crosstool-ng-1.18.0_build$
+]]>
+                </screen>
+                <para>然后，你把包含了上述arm-xscale-linux-gnueabi-gcc等文件的路径，加到环境变量PATH中，然后就可以使用了。</para>
+                <para></para>
+            </listitem>
+            <listitem>已验证和测试
+                <para>别人发布的，交叉编译器，一般都是，经过相应的验证和测试</para>
+                <para>保证了，可以使用，不会出问题的。</para>
+                <para>所以，你可以放心使用，不会担心，出现编译程序出错的时候，确保不会是由于交叉编译器问题。</para>
+            </listitem>
+            <listitem>已优化
+                <para>别人发布的交叉编译器，一般都是经过，在制作的时候，加了一些优化参数</para>
+                <para>使得针对某些方面，比如性能等等，做了相应的优化</para>
+                <para>使得，交叉编译器编译出来的程序，对于目标的CPU，是相对最优的</para>
+                <para></para>
+            </listitem>
+            <listitem>（售后）支持比较好
+                <para>就像你买东西，很多时候，不出问题的时候，售后，看不出有啥用</para>
+                <para>但是当出问题，就发现，售后其实很重要</para>
+                <para>而搞嵌入式开发，尤其是交叉编译</para>
+                <para>很多时候，涉及到很多技术细节</para>
+                <para>有时候遇到问题的话，如果你不熟悉，不了解，不会解决</para>
+                <para>这时候，去找到，交叉编译器的提供者，去咨询</para>
+                <para>对于你来说，就显得很有价值，很重要了。</para>
+                <para>别人提供的交叉编译器的话，往往都是提供后续的技术支持的</para>
+                <para>对于多数的开发者，这点，还是有价值的</para>
+            </listitem>
+        </itemizedlist>
+        
+        <sect3 xml:id="exising_crosstoolchain_download"><title>已有的交叉工具链的下载</title>
+            <para>参考：<link xl:href="http://www.cnblogs.com/esion/archive/2012/08/28/2660033.html" />，其实是可以安装后，设置好环境变量，之后就可以一直不变的去使用的。</para>
+            <para></para>
+            <para><link xl:href="http://www.myir-tech.com/download.asp" />中提供了很多东西下载，包括工具链。</para>
+            <para></para>
+
+            <sect4 xml:id="download_eldk"><title>ELDK的下载</title>
+                <para><link xl:href="http://www.denx.de/en/News/WebHome" /></para>
+                <para>-&gt; <link xl:href="ftp://ftp.denx.de/pub/eldk/5.3/" /></para>
+                <para>-&gt; <link xl:href="ftp://ftp.denx.de/pub/eldk/5.3/iso/" /></para>
+                <para>中有各种的，基于arm的eldk，比如：</para>
+                <itemizedlist>
+                    <listitem>eldk-5.3-armv4t.iso</listitem>
+                    <listitem>eldk-5.3-armv5te.iso</listitem>
+                    <listitem>eldk-5.3-armv6.iso</listitem>
+                    <listitem>eldk-5.3-armv6.iso</listitem>
+                    <listitem>eldk-5.3-armv7a-hf.iso</listitem>
+                    <listitem>eldk-5.3-armv7a.iso</listitem>
+                </itemizedlist>
+                <para>貌似是下载下来，解压后，去运行安装脚本后，就可以使用了。</para>
+                <para></para>
+            </sect4>
+        </sect3>
+    </sect2>
+
+    <sect2 xml:id="use_existing_cons"><title>使用已有交叉编译器的缺点</title>
+        <itemizedlist>
+            <listitem>无针对你自己的CPU的优化
+                <para>别人提供的，已有的交叉编译器，相对来说，更多时候，都是针对某个系列的CPU，进行制作出来的，进行优化的</para>
+                <para>即，其优化，也是相对比较通用的</para>
+                <para>如果你的CPU和其不同，则其就没有对应的优化了</para>
+                <para></para>
+            </listitem>
+            <listitem>专有化
+                <para>和上面有点类似，即没有针对你自己的CPU，进行优化</para>
+                <para></para>
+            </listitem>
+            <listitem>太老，太旧
+                <para>别人给的，网上可以下载到的，很多交叉编译器，相对来说，版本都比较旧了，都是很老的，之前的了</para>
+                <para>其所用的，其他各个组件，模块，也都是旧版本的</para>
+                <para>旧的软件，对于新出来的CPU，新的功能等，自然没有对应的支持</para>
+                <para>也就无法发挥新的硬件特性了了</para>
+                <para></para>
+            </listitem>
+            <listitem>其所用的源码不清楚
+                <para>别人给你编译好的交叉编译器，你是可以用了</para>
+                <para>但是，其针对于具体什么版本的源码，以及是否打了相应补丁等情况</para>
+                <para>你是无法，也很难知道的</para>
+                <para>所以，即无法掌控此已有交叉编译器的所用的源码的确切情况</para>
+                <para>此点，针对于你对自己的CPU很熟悉的情况下，想要完全了解已有交叉编译器的背后的情况而言，算是个缺点</para>
+                <para>即不能完全在你掌握范围内，不清楚后面的情况</para>
+            </listitem>
+            <listitem>未必适合你的系统
+                <para>或许是不可重载（relocatable）的</para>
+                <para>没有很方便的方式去获得一些系统库文件</para>
+                <para>所以，未必真正适合你自己的，嵌入式系统环境</para>
+            </listitem>
+        </itemizedlist>
+        <para></para>
+    </sect2>
+
+    <sect2 xml:id="self_build_pros"><title>自己手动编译交叉编译器的优点</title>
+        <itemizedlist>
+            <listitem>自定义各种组件及版本
+                <para>对于自己去制作交叉编译器的话，则其所用的各种组件，模块的版本，都可以自己选择和定制</para>
+                <para></para>
+                <para></para>
+            </listitem>
+            <listitem>针对你自己的CPU进行特定的优化
+                <para></para>
+                <para></para>
+                <para></para>
+            </listitem>
+            <listitem>对于各种补丁包，已经很清楚了
+                <para>既然是自己制作交叉编译器，那么自然选择了，相对较新的源码包，以及各种模块</para>
+                <para>其自然，已经现存有很多补丁包</para>
+                <para>这些补丁包，修复了很多bug，或者是增加了很多新的功能支持等</para>
+                <para>这时候，你就可以找到并打上这些补丁包</para>
+                <para>以实现，修复该模块的已知的bug，增加新的功能的支持了</para>
+                <para></para>
+            </listitem>
+            <listitem>Same source for all targets
+                <para>暂未搞懂此点的确切含义。</para>
+                <para></para>
+                <para></para>
+            </listitem>
+            <listitem>可以同步更新最新补丁
+                <para>相应的，如果有最新的补丁，也可以及时打上</para>
+                <para></para>
+            </listitem>
+            <listitem>可重复
+                <para>对于自己制作交叉编译器的话，</para>
+                <para>制作完成后，就确定了对应的各个模块的版本，有了对应的配置文件</para>
+                <para>此配置，拿到别的地方，别人用同样的工具和类似的环境，是可以重新编译为其自己的</para>
+                <para>即，所谓的可重复，别人可以利用你已经验证，可以正常制作和使用的各个版本的模块和配置，实现自己也制作一个属于自己的交叉编译器</para>
+                <para></para>
+            </listitem>
+            <listitem>有社区支持
+                <para>当然，对应的，在制作交叉编译器期间，使用交叉编译器期间，</para>
+                <para>出了问题，有任何疑问，都有对应的社区的，热心人，帮你解决，回答你的问题。</para>
+                <para></para>
+            </listitem>
+            <listitem>适合你自己的系统
+                <para>如前所述，拿别人已制作好的交叉编译器，未必真正完全适合你自己的系统</para>
+                <para>而如果你自己制作的话，当然就完全根据自己的需求，去制作出最适合自己的系统的交叉编译器了</para>
+                <para></para>
+            </listitem>
+        </itemizedlist>
+        <para></para>
+    </sect2>
+
+    <sect2 xml:id="self_build_cons"><title>自己手动编译交叉编译器的缺点</title>
+        <itemizedlist>
+            <listitem>制作交叉编译器相对比较复杂
+                <para>制作交叉编译器，相对来说，是个技术活加体力活</para>
+                <para>不仅仅要求有对应的知识背景，解决各种问题的能力，</para>
+                <para>还要准备一定的时间和精力，去真正实现，真正去建立出来一个可用的交叉编译器</para>
+                <para></para>
+            </listitem>
+            <listitem>可能存在的，对于你的处理器支持度不是足够好
+                <para>既然制作交叉编译器期间，可能需要打上很多的patch等等</para>
+                <para>那也就存在，比如缺少了对应的补丁，补丁不太完整，补丁不合适等等特殊情况</para>
+                <para>使得，对于对应的，有些处理器，支持度，不是很好</para>
+            </listitem>
+            <listitem>验证
+                <para>在制作出了交叉编译器后，其实还需要一定的验证，保证其可用，好用。</para>
+                <para>这也需要对应的技术能力，和精力，去实现。</para>
+                <para></para>
+            </listitem>
+            <listitem>社区的支持
+                <para>对于社区的支持，有其之前所说的优点，那就是，社区活跃的话，可能解决问题的效率就相对较高</para>
+                <para>但是当社区不够活跃，社区中没有合适的人，那么可能你的问题，就很难得到解决</para>
+                <para>即，有问题的时候，依靠社区去解决，未必是完全靠谱的。</para>
+            </listitem>
+        </itemizedlist>
+        <para></para>
+    </sect2>
+
+</sect1>
+
+</chapter>
